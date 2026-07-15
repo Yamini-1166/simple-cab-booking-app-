@@ -1,0 +1,56 @@
+// frontend.js
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import axios from "axios";
+
+function App() {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [ride, setRide] = useState({ pickup: "", drop: "", cabType: "mini" });
+  const [rides, setRides] = useState([]);
+
+  const login = async () => {
+    const res = await axios.post("http://localhost:5000/login", form);
+    alert(res.data.message);
+  };
+
+  const bookRide = async () => {
+    const res = await axios.post("http://localhost:5000/book", ride);
+    alert("Ride booked!");
+  };
+
+  const getRides = async () => {
+    const res = await axios.get("http://localhost:5000/rides");
+    setRides(res.data);
+  };
+
+  return (
+    <div>
+      <h2>Cab Booking App</h2>
+
+      <h3>Login</h3>
+      <input placeholder="Email" onChange={e => setForm({ ...form, email: e.target.value })} />
+      <input placeholder="Password" type="password" onChange={e => setForm({ ...form, password: e.target.value })} />
+      <button onClick={login}>Login</button>
+
+      <h3>Book Ride</h3>
+      <input placeholder="Pickup" onChange={e => setRide({ ...ride, pickup: e.target.value })} />
+      <input placeholder="Drop" onChange={e => setRide({ ...ride, drop: e.target.value })} />
+      <select onChange={e => setRide({ ...ride, cabType: e.target.value })}>
+        <option value="mini">Mini</option>
+        <option value="sedan">Sedan</option>
+        <option value="suv">SUV</option>
+      </select>
+      <button onClick={bookRide}>Book</button>
+
+      <h3>Ride History</h3>
+      <button onClick={getRides}>Show Rides</button>
+      <ul>
+        {rides.map(r => (
+          <li key={r._id}>{r.pickup} → {r.drop} ({r.cabType}) - {r.status}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
