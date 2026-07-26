@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
+const rideRoutes = require("./routes/rideRoutes");
 
 const app = express();
 
@@ -16,6 +17,7 @@ mongoose
   .catch((error) => console.log("Database Error:", error));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/rides", rideRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Ucab API is running 🚕" });
