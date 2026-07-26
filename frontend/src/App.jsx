@@ -4,10 +4,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import BookRide from "./pages/BookRide";
 import RideHistory from "./pages/RideHistory";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <BrowserRouter>
+      <Navbar />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
