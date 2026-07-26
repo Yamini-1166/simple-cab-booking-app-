@@ -1,77 +1,84 @@
 import { useState } from "react";
-import axios from "axios";
 
 function BookRide() {
-  const [formData, setFormData] = useState({
-    pickupLocation: "",
-    dropLocation: "",
-    vehicleType: "Mini",
-    fare: 100,
-  });
+  const [pickupLocation, setPickupLocation] = useState("");
+  const [dropLocation, setDropLocation] = useState("");
+  const [rideType, setRideType] = useState("car");
+  const [message, setMessage] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleBookRide = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await axios.post(
-        "http://localhost:5000/api/rides/book",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+    if (!pickupLocation || !dropLocation) {
+      setMessage("Please enter pickup and drop locations");
+      return;
+    }
 
-      alert("Ride booked successfully!");
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/rides/book", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          pickupLocation,
+          dropLocation,
+          rideType,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.message || "Failed to book ride");
+        return;
+      }
+
+      setMessage("Ride booked successfully!");
+
+      setPickupLocation("");
+      setDropLocation("");
+      setRideType("car");
     } catch (error) {
-      alert(error.response?.data?.message || "Booking failed");
+      setMessage("Server error. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h1>Book Your Ride 🚕</h1>
+    <div className="page-container">
+      <h1>Book a Ride</h1>
 
-      <form onSubmit={handleBookRide}>
+      <form onSubmit={handleSubmit} className="ride-form">
         <input
-          name="pickupLocation"
-          placeholder="Pickup Location"
-          onChange={handleChange}
-          required
+          type="text"
+          placeholder="Enter pickup location"
+          value={pickupLocation}
+          onChange={(e) => setPickupLocation(e.target.value)}
         />
 
         <input
-          name="dropLocation"
-          placeholder="Drop Location"
-          onChange={handleChange}
-          required
+          type="text"
+          placeholder="Enter drop location"
+          value={dropLocation}
+          onChange={(e) => setDropLocation(e.target.value)}
         />
 
-        <select name="vehicleType" onChange={handleChange}>
-          <option value="Mini">Mini</option>
-          <option value="Sedan">Sedan</option>
-          <option value="SUV">SUV</option>
+        <select
+          value={rideType}
+          onChange={(e) => setRideType(e.target.value)}
+        >
+          <option value="car">Car</option>
+          <option value="bike">Bike</option>
+          <option value="auto">Auto</option>
         </select>
-
-        <input
-          name="fare"
-          type="number"
-          placeholder="Fare"
-          value={formData.fare}
-          onChange={handleChange}
-          required
-        />
 
         <button type="submit">Book Ride</button>
       </form>
+
+      {message && <p>{message}</p>}
     </div>
   );
 }
