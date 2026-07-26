@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
 const rideRoutes = require("./routes/rideRoutes");
+const driverRoutes = require("./routes/driverRoutes");
 
 const app = express();
 
@@ -18,6 +19,7 @@ mongoose
 
 app.use("/api/auth", authRoutes);
 app.use("/api/rides", rideRoutes);
+app.use("/api/drivers", driverRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Ucab API is running 🚕" });
